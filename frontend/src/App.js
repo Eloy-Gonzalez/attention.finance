@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-
-import {
-  CssBaseline,
-  Box,
+import { 
+  CssBaseline, 
+  Box, 
   Toolbar,
   List,
   Typography,
@@ -13,31 +12,18 @@ import {
   Grid,
   Paper,
   Link,
-  ListItem,
-  ListItemIcon,
-  ListItemText
-} from '@mui/material';
+  Button } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import LogoutIcon from '@mui/icons-material/Logout';
-
-// @Redux
-import { useDispatch } from 'react-redux';
-
-// @Actions
-import { LOGOUT } from 'state/auth/actionsTypes';
-
-import { Link as RouterLink } from "react-router-dom";
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="#">
-        City Builder
+      <Link color="inherit" href="https://attentionfinance.andersa.repl.co/">
+        Attention Finance
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -93,26 +79,20 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function DashboardContent({ title = "Not title assigned", children } = {}) {
-  document.title = title;
+function DashboardContent() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
-  const dispatch = useDispatch();
 
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
-          <Toolbar
-            sx={{
-              pr: '24px'
-            }}
-          >
+          <Toolbar>
             <IconButton
+              size="large"
               edge="start"
               color="inherit"
               aria-label="open drawer"
@@ -124,15 +104,10 @@ function DashboardContent({ title = "Not title assigned", children } = {}) {
             >
               <MenuIcon />
             </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              City Builder
+            <Typography variant="h6" component="div"    sx={{ flexGrow: 1 }}>
+              Attention Finance
             </Typography>
+            <Button variant="outlined" color="inherit">Connect Wallet</Button>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -149,29 +124,6 @@ function DashboardContent({ title = "Not title assigned", children } = {}) {
             </IconButton>
           </Toolbar>
           <Divider />
-          <List>
-            <>
-              <ListItem button component={RouterLink} to="/">
-                <ListItemIcon>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary="Transactions" />
-              </ListItem>
-              <ListItem button component={RouterLink} to="/erc">
-                <ListItemIcon>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary="Transactions ERC20" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText onClick={() => { dispatch({ type: LOGOUT }) }} primary="Logout" />
-              </ListItem>
-            </>
-          </List>
-          <Divider />
         </Drawer>
         <Box
           component="main"
@@ -186,11 +138,18 @@ function DashboardContent({ title = "Not title assigned", children } = {}) {
           }}
         >
           <Toolbar />
-          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                 {children}
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container>
+              <Grid item xs={12} md={12} lg={12}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 'calc(80vh - 52px)',
+                  }}
+                >
+                 <h1>test</h1>
                 </Paper>
               </Grid>
             </Grid>
@@ -202,6 +161,6 @@ function DashboardContent({ title = "Not title assigned", children } = {}) {
   );
 }
 
-export default function DashboardLayout({ title = "Not title assigned", children } = {}) {
-  return <DashboardContent title={title} children={children} />;
+export default function Dashboard() {
+  return <DashboardContent />;
 }

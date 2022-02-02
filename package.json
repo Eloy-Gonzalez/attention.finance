@@ -1,7 +1,6 @@
 {
   "name": "attentionfinance",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,5 +10,16 @@
   "license": "ISC",
   "devDependencies": {
     "node": "^16.13.2"
-  }
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "axios": "^0.25.0",
+    "compression": "^1.7.4",
+    "express": "^4.17.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "web-vitals": "^2.1.4"
+  },
+  "description": ""
 }
