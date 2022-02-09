@@ -11,7 +11,8 @@ import {
   Grid,
   Paper,
   Link,
-  Button } from '@mui/material';
+  Button,
+  Modal } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -19,6 +20,10 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Web3 from 'web3'
 import detectEthereumProvider from '@metamask/detect-provider';
 import axios from 'axios';
+import WalletConnectIcon from './assets/walletconnect.svg';
+import MetamaskIcon from './assets/metamask.svg';
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
 
 function Copyright(props) {
   return (
@@ -79,10 +84,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const mdTheme = createTheme();
+const mdTheme = createTheme({
+  typography: {
+    button: {
+      textTransform: "none"
+    }
+  }
+});
 
 function Table(props) {
-  console.log(props)
   return (
     <>
       <p>Balance account: { props.balance ? props.balance[0].account : 'Null' }</p>
@@ -96,6 +106,9 @@ function DashboardContent() {
   const [currentAccount, setCurrentAccount] = React.useState('')
   const [isLogged, setIsLogged] = React.useState(false);
   const [balance, setBalance] = React.useState('');
+  const [modalOpen, setmodalOpen] = React.useState(false);
+  const handleOpen = () => setmodalOpen(true);
+  const handleClose = () => setmodalOpen(false);
 
   useEffect(() => {
     async function fetch() {
@@ -110,7 +123,7 @@ function DashboardContent() {
 		return `${currentAccount.substr(0,4)}...${currentAccount.substring(currentAccount.length - 4, currentAccount.length)}`
 	}
 
-	const SignIn = async () => {
+	const SignInMetamask = async () => {
 		//Detect Provider
 		const provider = await detectEthereumProvider()
 		const web3 = new Web3(provider)
@@ -155,6 +168,67 @@ function DashboardContent() {
     setOpen(!open);
   };
 
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const modalStyles = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexFlow: 'column',
+    cursor: 'pointer'
+  };
+
+  const SignInWalletConnector = async () => {
+    // Create a connector
+    const connector = new WalletConnect({
+      bridge: "https://bridge.walletconnect.org", // Required
+      qrcodeModal: QRCodeModal,
+    });
+
+    // Check if connection is already established
+    if (!connector.connected) {
+      // create new session
+      connector.createSession();
+    }
+
+    // Subscribe to connection events
+    connector.on("connect", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+
+      // Get provided accounts and chainId
+      const { accounts, chainId } = payload.params[0];
+    });
+
+    connector.on("session_update", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+    
+      // Get updated accounts and chainId
+      const { accounts, chainId } = payload.params[0];
+    });
+
+    connector.on("disconnect", (error, payload) => {
+      if (error) {
+        throw error;
+      }
+    
+      // Delete connector
+    });
+  }
+
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -174,10 +248,10 @@ function DashboardContent() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div"    sx={{ flexGrow: 1 }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Attention Finance
             </Typography>
-            <Button variant="primary" onClick={SignIn}>{isLogged ? 'Connected ' + shortAddr() : "Connect wallet"}</Button>
+            <Button variant="primary" onClick={handleOpen}>Connect Wallet</Button>
 						<Button onClick={SignOut} style={{visibility: isLogged ? "visible" : "hidden", color: 'white'}}>X</Button>
           </Toolbar>
         </AppBar>
@@ -233,6 +307,26 @@ function DashboardContent() {
           </Container>
         </Box>
       </Box>
+      <Modal
+        open={modalOpen}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography variant="h6" component="h2">Select Wallet</Typography>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+            <Button style={modalStyles} variant="primary" onClick={SignInMetamask}>
+              <img src={MetamaskIcon} alt="Metamask wallet" width="100px" />
+              <Typography variant="h6" component="h2">Metamask</Typography>  
+            </Button>
+            <Button style={modalStyles} variant="primary" onClick={SignInWalletConnector}>
+              <img src={WalletConnectIcon} alt="Wallet Connector" height="89px" />
+              <Typography variant="h6" component="h2">WalletConnector</Typography>
+            </Button>
+          </div>
+        </Box>
+      </Modal>
     </ThemeProvider>
   );
 }
